@@ -4,6 +4,16 @@ A Claude Code / Codex / OpenClaw / WorkBuddy skill that queries the
 [12Zodiacs.com Chinese Almanac API](https://www.12zodiacs.com/about-us/api/) —
 free, no API key needed for recent dates.
 
+**🌐 About the project** — this skill is the open-source client of the
+[Tung Shing engine](https://www.12zodiacs.com/tung-shing/) at 12Zodiacs.com:
+
+- **[Today's Almanac](https://www.12zodiacs.com/tung-shing/)** — the full web app:
+  daily almanac, month calendars, auspicious-date topics, festival dates, and an
+  embedded AI prompt builder
+- **[Methodology](https://www.12zodiacs.com/tung-shing/methodology/)** — how the
+  engine computes: JPL DE440s ephemeris, the 1739 imperial canon, four-tier
+  spirit arbitration, and validation against mainstream almanacs
+
 **What you get**: daily auspicious (宜) / avoid (忌) activities, the twelve
 Day Officers (建除十二神), Yellow/Black Belt hour deities (黃道黑道), zodiac
 clash (冲煞), lunar dates, and minute-precision 24 solar terms (节气) —

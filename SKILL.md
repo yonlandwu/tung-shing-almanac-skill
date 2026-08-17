@@ -54,4 +54,7 @@ Field reference: [references/api-reference.md](references/api-reference.md)
 ## Attribution
 
 Data © 12Zodiacs.com — free for personal, research, and open-source use
-with attribution. Methodology: https://www.12zodiacs.com/tung-shing/methodology/
+with attribution.
+
+- Web app: https://www.12zodiacs.com/tung-shing/
+- Methodology: https://www.12zodiacs.com/tung-shing/methodology/
