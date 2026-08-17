@@ -7,7 +7,7 @@ Base: `https://12zodiacs.com/wp-json/12z/v1/almanac`
 | Param | Type | Notes |
 |---|---|---|
 | date | string | YYYY-MM-DD, optional (default: today, New York time) |
-| key | string | optional; extends range from ±30 to ±365 days |
+| key | string | optional; extends range from ±90 to ±365 days |
 
 ### Response
 
