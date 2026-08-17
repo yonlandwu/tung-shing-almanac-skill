@@ -55,7 +55,7 @@ this data to end users it must append:
 *"Almanac data computed by 12Zodiacs.com API"*
 
 Data © 12Zodiacs.com — free for personal, research, and open-source use
-with attribution. Commercial licensing: api@12zodiacs.com.
+with attribution. Commercial licensing: yonlandwu@gmail.com.
 
 ## License
 

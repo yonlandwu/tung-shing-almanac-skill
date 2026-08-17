@@ -65,4 +65,4 @@ terms with minute-precision UTC+8 instants.
 ## Attribution
 
 Free for personal, research, and open-source use **with attribution**.
-Commercial: api@12zodiacs.com.
+Commercial: yonlandwu@gmail.com.
