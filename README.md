@@ -45,6 +45,47 @@ bash scripts/almanac.sh auspicious wedding     # best wedding dates (30d)
 bash scripts/almanac.sh horoscope rabbit       # Rabbit's daily horoscope
 ```
 
+What `almanac.sh day 2026-08-18` returns (truncated):
+
+```json
+{
+  "date": "2026-08-18",
+  "lunar": { "year_gz_cn": "丙午", "month": 7, "day": 6 },
+  "day_pillar": { "stem_cn": "甲", "branch_cn": "子", "gz_index": 1 },
+  "day_officer_zhi_shen": { "en": "Stable", "cn": "定", "quality": "auspicious" },
+  "belt": { "name_cn": "青龙", "type": "yellow" },
+  "clash": { "animal": "Horse", "years": [1954, 1966, 1978, 1990, 2002, 2014] },
+  "auspicious_for_yi": ["Engagement, contracts", "Bed installation"],
+  "avoid_ji": ["Legal disputes, travel"],
+  "solar_term": null,
+  "xiu_28": { "cn": "翼", "luminary": "Fire", "animal": "Snake" }
+}
+```
+
+## Why 12Zodiacs API?
+
+Most Chinese calendar APIs scrape or approximate. This one is built different:
+
+- **Minute-precision solar terms** — computed from NASA JPL DE440s ephemeris
+  (not day-granularity lookup tables). 立秋 2026 = Aug 7, 19:42 CST, exact.
+- **Four-tier spirit arbitration** — Day Officers (建除十二神), Yellow/Black
+  Belt deities, and spirit conflicts resolved per the 1739 imperial
+  *Qianlong Xie Ji Bian Fang Shu* canon, cross-validated against mainstream
+  almanacs (12/12 hour pillars match).
+- **1900–2100 coverage** — 201 years of lunisolar conversion, leap months,
+  GanZhi pillars, 28 lunar mansions, and festival dates.
+
+## Use Cases
+
+- **Daily zodiac bot** — schedule `horoscope` for all 12 signs into a
+  Twitter/WeChat/Discord bot pipeline
+- **Smart scheduling assistant** — let your agent check `auspicious` before
+  booking weddings, moves, or contract signings in calendar apps
+- **Localización & content pipelines** — embed authentic almanac data into
+  CMS workflows, newsletters, or programmatic SEO pages
+- **MCP servers & agent frameworks** — a drop-in cultural data source for
+  any tool-calling agent
+
 ## Free Tier
 
 - Anonymous: today ±30 days, 30 req/min
