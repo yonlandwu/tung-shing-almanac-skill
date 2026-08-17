@@ -14,14 +14,14 @@ computed from JPL DE440s ephemeris and the 1739 imperial canon.
 ### Claude Code
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/tung-shing-almanac-skill.git \
+git clone https://github.com/yonlandwu/tung-shing-almanac-skill.git \
   ~/.claude/skills/tung-shing-almanac
 ```
 
 ### OpenClaw / WorkBuddy
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/tung-shing-almanac-skill.git \
+git clone https://github.com/yonlandwu/tung-shing-almanac-skill.git \
   ~/.openclaw/skills/tung-shing-almanac   # or ~/.workbuddy/skills/
 ```
 
