@@ -35,8 +35,12 @@ case "$CMD" in
     : "${ARG:?usage: almanac.sh lucky-hour <zodiac> [date] [key]}"
     DATE_L="${3:-}"
     DATE_Q=""
-    if [[ "$DATE_L" =~ ^[0-9]{4}- ]]; then DATE_Q="&date=$DATE_L"; fi
-    curl -s "${API}/personal-hours?zodiac=${ARG}${DATE_Q}${KEY_Q}" | jq .
+    KEY_LQ=""
+    if [[ "$DATE_L" =~ ^[0-9]{4}- ]]; then
+      DATE_Q="&date=$DATE_L"
+      [ -n "${4:-}" ] && KEY_LQ="&key=$4"
+    fi
+    curl -s "${API}/personal-hours?zodiac=${ARG}${DATE_Q}${KEY_LQ}" | jq .
     ;;
   horoscope)
     # Daily zodiac horoscope: rat|ox|tiger|rabbit|dragon|snake|horse|goat|monkey|rooster|dog|pig
