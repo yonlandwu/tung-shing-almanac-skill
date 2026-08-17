@@ -1,7 +1,7 @@
 # Tung Shing Almanac Skill (通勝黄历)
 
 A Claude Code / Codex / OpenClaw / WorkBuddy skill that queries the
-[12Zodiacs.com Chinese Almanac API](https://www.12zodiacs.com/tung-shing/api/) —
+[12Zodiacs.com Chinese Almanac API](https://www.12zodiacs.com/about-us/api/) —
 free, no API key needed for recent dates.
 
 **What you get**: daily auspicious (宜) / avoid (忌) activities, the twelve
@@ -48,7 +48,7 @@ bash scripts/almanac.sh horoscope rabbit       # Rabbit's daily horoscope
 ## Free Tier
 
 - Anonymous: today ±30 days, 30 req/min
-- Free key (±365 days, 10/min + 100/day): [request here](https://www.12zodiacs.com/tung-shing/api/)
+- Free key (±365 days, 10/min + 100/day): [request here](https://www.12zodiacs.com/about-us/api/)
 
 ## Attribution (required)
 

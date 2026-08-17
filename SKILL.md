@@ -46,7 +46,7 @@ Field reference: [references/api-reference.md](references/api-reference.md)
    and solar terms are engine-computed; quote API values verbatim.
 3. **Cultural reference only** — not medical, legal, or financial advice.
 4. Free tier: ±30 days around today (anonymous), ±365 days with a key
-   (request: https://www.12zodiacs.com/tung-shing/api/).
+   (request: https://www.12zodiacs.com/about-us/api/).
 
 ## Attribution
 
