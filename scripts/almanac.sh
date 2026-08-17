@@ -24,11 +24,17 @@ case "$CMD" in
     curl -s "${API}/term?year=${ARG}${KEY_Q}" | jq .
     ;;
   auspicious)
-    # Pick auspicious dates for an activity: wedding|moving-house|grand-opening|
-    # renovation|c-section|signing-contracts|travel|starting-a-new-job
-    : "${ARG:?usage: almanac.sh auspicious <activity> [key]  (days=30 default)}"
-    DAYS="${4:-30}"
-    curl -s "${API}/auspicious?activity=${ARG}&days=${DAYS}${KEY_Q}" | jq .
+    # Pick auspicious dates for an activity. Synonyms welcome:
+    # wedding|marriage|moving|buy-a-car|开业|装修|travel|... (see README table)
+    # Usage: auspicious <activity> [days=30] [weekend_only=0] [api_key]
+    DAYS="${3:-30}"
+    WEEKEND="${4:-0}"
+    KEY_A="${5:-}"
+    WK_Q=""
+    KEY_AQ=""
+    [ "$WEEKEND" = "1" ] && WK_Q="&weekend_only=1"
+    [ -n "$KEY_A" ] && KEY_AQ="&key=$KEY_A"
+    curl -s "${API}/auspicious?activity=${ARG}&days=${DAYS}${WK_Q}${KEY_AQ}" | jq .
     ;;
   lucky-hour)
     # Personal best hours for your zodiac on a date: e.g. lucky-hour horse 2026-08-22

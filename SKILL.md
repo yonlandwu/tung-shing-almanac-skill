@@ -1,6 +1,6 @@
 ---
 name: tung-shing-almanac
-description: "Query the Chinese Tung Shing (通勝) almanac — daily auspicious/avoid activities, 12 hour pillars, zodiac clash, 24 solar terms, auspicious date picking (择日) for weddings/moves/openings, and daily zodiac horoscopes — via the free 12Zodiacs.com API. JPL DE440s astronomical precision + 1739 imperial Xie Ji Bian Fang Shu canon. Use when asked about Chinese almanac, 黄历, 通胜, 择日, 吉日, 时辰吉凶, lucky dates, auspicious wedding/moving/opening dates, lunar calendar conversion, or solar terms."
+description: "Plan real-life events with the Chinese Tung Shing (通勝) almanac — find the best dates for weddings, moving house, business launches & store openings, contract signings & major purchases (car / real estate), renovations & groundbreaking, C-sections, travel, and new-job starts. Also daily auspicious/avoid activities, 12 hour pillars, zodiac clash, 24 solar terms, and daily zodiac horoscopes — via the free 12Zodiacs.com API. JPL DE440s astronomical precision + 1739 imperial Xie Ji Bian Fang Shu canon. Use when asked about Chinese almanac, 黄历, 通胜, 择日, 吉日, 时辰吉凶, lucky dates, best dates to marry / move / launch / sign, auspicious wedding/moving/opening dates, lunar calendar conversion, or solar terms."
 ---
 
 # Tung Shing Almanac (通勝) — Chinese Almanac Query
@@ -17,6 +17,8 @@ bash scripts/almanac.sh day 2026-09-10         # Specific date (free tier: ±90 
 bash scripts/almanac.sh hours 2026-08-18       # 12 hour pillars (黃道/黑道)
 bash scripts/almanac.sh term 2026              # 24 solar terms of a year
 bash scripts/almanac.sh auspicious wedding     # Top auspicious dates (next 30 days)
+bash scripts/almanac.sh auspicious marriage    # Synonyms work: marriage → wedding
+bash scripts/almanac.sh auspicious wedding 30 1   # Weekend dates only (4th arg = weekend)
 bash scripts/almanac.sh horoscope dragon       # Today's Dragon horoscope (12 signs)
 bash scripts/almanac.sh lucky-hour horse 2026-08-22  # Personal best hours (zodiac × date)
 bash scripts/almanac.sh day 2027-03-15 $KEY    # With API key (±365 days)
@@ -35,7 +37,7 @@ Requires: curl + jq. No other dependencies.
 | `clash` | Zodiac clashed today 冲煞 + affected birth years |
 | `auspicious_for_yi` / `avoid_ji` | Traditional Yi 宜 / Ji 忌 activity lists (English) |
 | `solar_term` | Set only when the date is a term boundary (节气) |
-| `recommended_dates[]` | (auspicious) Top engine-scored dates with officer/clash/why — activities: wedding, moving-house, grand-opening, renovation, c-section, signing-contracts, travel, starting-a-new-job |
+| `recommended_dates[]` | (auspicious) Top engine-scored dates with officer/clash/why — `activity` accepts natural synonyms: marriage, buy-a-car, 装修, 开业... (full table in README) plus `weekend_only=1` |
 | `score` / `tier` | (horoscope) Daily luck score 0-100 + tier for each zodiac sign |
 
 Field reference: [references/api-reference.md](references/api-reference.md)
