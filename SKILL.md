@@ -13,7 +13,7 @@ per the 1739 imperial *Xie Ji Bian Fang Shu* (協紀辨方書).
 
 ```bash
 bash scripts/almanac.sh day                    # Today (NY) full almanac
-bash scripts/almanac.sh day 2026-09-10         # Specific date (free tier: ±30 days)
+bash scripts/almanac.sh day 2026-09-10         # Specific date (free tier: ±90 days)
 bash scripts/almanac.sh hours 2026-08-18       # 12 hour pillars (黃道/黑道)
 bash scripts/almanac.sh term 2026              # 24 solar terms of a year
 bash scripts/almanac.sh auspicious wedding     # Top auspicious dates (next 30 days)
@@ -48,7 +48,7 @@ Field reference: [references/api-reference.md](references/api-reference.md)
 2. **Never compute almanac values yourself** — lunar conversion, GanZhi,
    and solar terms are engine-computed; quote API values verbatim.
 3. **Cultural reference only** — not medical, legal, or financial advice.
-4. Free tier: ±30 days around today (anonymous), ±365 days with a key
+4. Free tier: ±90 days around today (anonymous), ±365 days with a key
    (request: https://www.12zodiacs.com/about-us/api/).
 
 ## Attribution

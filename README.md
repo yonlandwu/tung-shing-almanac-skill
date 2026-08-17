@@ -2,7 +2,7 @@
 
 A Claude Code / Codex / OpenClaw / WorkBuddy skill that queries the
 [12Zodiacs.com Chinese Almanac API](https://www.12zodiacs.com/about-us/api/) —
-free, no API key needed for recent dates.
+free, no API key needed for ±90 days.
 
 **🌐 About the project** — this skill is the open-source client of the
 [Tung Shing engine](https://www.12zodiacs.com/tung-shing/) at 12Zodiacs.com:
@@ -98,7 +98,7 @@ Most Chinese calendar APIs scrape or approximate. This one is built different:
 
 ## Free Tier
 
-- Anonymous: today ±30 days, 30 req/min
+- Anonymous: today ±90 days, 30 req/min
 - Free key (±365 days, 10/min + 100/day): [request here](https://www.12zodiacs.com/about-us/api/)
 
 ## Attribution (required)

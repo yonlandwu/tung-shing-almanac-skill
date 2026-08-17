@@ -59,7 +59,7 @@ terms with minute-precision UTC+8 instants.
 | Code | Meaning |
 |---|---|
 | 401 `invalid_key` | Unknown API key |
-| 403 `date_out_of_free_range` | Date outside ±30d (anon) or ±365d (key) |
+| 403 `date_out_of_free_range` | Date outside ±90d (anon) or ±365d (key) |
 | 429 `rate_limited` | IP 30/min; key 10/min + 100/day |
 
 ## Attribution
