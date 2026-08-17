@@ -13,13 +13,13 @@ per the 1739 imperial *Xie Ji Bian Fang Shu* (協紀辨方書).
 
 ```bash
 bash scripts/almanac.sh day                    # Today (NY) full almanac
-bash scripts/almanac.sh day 2026-09-25         # Specific date
+bash scripts/almanac.sh day 2026-09-10         # Specific date (free tier: ±30 days)
 bash scripts/almanac.sh hours 2026-08-18       # 12 hour pillars (黃道/黑道)
 bash scripts/almanac.sh term 2026              # 24 solar terms of a year
 bash scripts/almanac.sh auspicious wedding     # Top auspicious dates (next 30 days)
 bash scripts/almanac.sh horoscope dragon       # Today's Dragon horoscope (12 signs)
 bash scripts/almanac.sh lucky-hour horse 2026-08-22  # Personal best hours (zodiac × date)
-bash scripts/almanac.sh day 2026-09-25 $KEY    # With API key (±365 days)
+bash scripts/almanac.sh day 2027-03-15 $KEY    # With API key (±365 days)
 ```
 
 Requires: curl + jq. No other dependencies.
