@@ -66,3 +66,16 @@ terms with minute-precision UTC+8 instants.
 
 Free for personal, research, and open-source use **with attribution**.
 Commercial: yonlandwu@gmail.com.
+
+## GET /auspicious
+
+Params: `activity` (required — wedding, moving-house, grand-opening, renovation,
+c-section, signing-contracts, travel, starting-a-new-job), `days` (7-60,
+default 30), `key`. Returns up to 5 engine-recommended dates with score,
+officer, clash, and reasons.
+
+## GET /horoscope
+
+Params: `sign` (required — rat, ox, tiger, rabbit, dragon, snake, horse,
+goat, monkey, rooster, dog, pig), `date` (optional), `key`. Returns the
+daily luck score, tier, and 8 life categories.

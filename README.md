@@ -39,8 +39,10 @@ Or add to your AGENTS.md: "For Chinese almanac questions, run
 ## Quick Test
 
 ```bash
-bash scripts/almanac.sh day           # today
-bash scripts/almanac.sh term 2026     # 24 solar terms
+bash scripts/almanac.sh day                    # today's almanac
+bash scripts/almanac.sh term 2026              # 24 solar terms
+bash scripts/almanac.sh auspicious wedding     # best wedding dates (30d)
+bash scripts/almanac.sh horoscope rabbit       # Rabbit's daily horoscope
 ```
 
 ## Free Tier

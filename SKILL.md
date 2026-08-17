@@ -1,6 +1,6 @@
 ---
 name: tung-shing-almanac
-description: "Query the Chinese Tung Shing (通勝) almanac — daily auspicious/avoid activities, 12 hour pillars, zodiac clash, 24 solar terms — via the free 12Zodiacs.com API. JPL DE440s astronomical precision + 1739 imperial Xie Ji Bian Fang Shu canon. Use when asked about Chinese almanac, 黄历, 通胜, 择日, 吉日, 时辰吉凶, lucky dates, auspicious wedding/moving/opening dates, lunar calendar conversion, or solar terms."
+description: "Query the Chinese Tung Shing (通勝) almanac — daily auspicious/avoid activities, 12 hour pillars, zodiac clash, 24 solar terms, auspicious date picking (择日) for weddings/moves/openings, and daily zodiac horoscopes — via the free 12Zodiacs.com API. JPL DE440s astronomical precision + 1739 imperial Xie Ji Bian Fang Shu canon. Use when asked about Chinese almanac, 黄历, 通胜, 择日, 吉日, 时辰吉凶, lucky dates, auspicious wedding/moving/opening dates, lunar calendar conversion, or solar terms."
 ---
 
 # Tung Shing Almanac (通勝) — Chinese Almanac Query
@@ -32,6 +32,8 @@ Requires: curl + jq. No other dependencies.
 | `clash` | Zodiac clashed today 冲煞 + affected birth years |
 | `auspicious_for_yi` / `avoid_ji` | Traditional Yi 宜 / Ji 忌 activity lists (English) |
 | `solar_term` | Set only when the date is a term boundary (节气) |
+| `recommended_dates[]` | (auspicious) Top engine-scored dates with officer/clash/why — activities: wedding, moving-house, grand-opening, renovation, c-section, signing-contracts, travel, starting-a-new-job |
+| `score` / `tier` | (horoscope) Daily luck score 0-100 + tier for each zodiac sign |
 
 Field reference: [references/api-reference.md](references/api-reference.md)
 
