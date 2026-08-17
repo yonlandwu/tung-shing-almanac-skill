@@ -38,6 +38,14 @@ git clone https://github.com/yonlandwu/tung-shing-almanac-skill.git \
   ~/.openclaw/skills/tung-shing-almanac   # or ~/.workbuddy/skills/
 ```
 
+### ClawHub (OpenClaw ecosystem)
+
+```bash
+npx skills add yonlandwu/tung-shing-almanac-skill
+```
+
+Published on [ClawHub](https://clawhub.ai/yonlandwu/skills/tung-shing-almanac-skill) — the OpenClaw skill registry.
+
 ### Codex (any agent with shell access)
 
 Clone anywhere and run:
