@@ -46,16 +46,18 @@ npx skills add yonlandwu/tung-shing-almanac-skill
 
 Published on [ClawHub](https://clawhub.ai/yonlandwu/skills/tung-shing-almanac-skill) — the OpenClaw skill registry.
 
-### Codex (any agent with shell access)
-
-Clone anywhere and run:
+### Codex / OpenAI
 
 ```bash
-bash scripts/almanac.sh day 2026-08-18
+# skills CLI (installs into ~/.agents/skills/, auto-discovered by Codex)
+npx skills add yonlandwu/tung-shing-almanac-skill -g
+
+# or built-in installer inside a Codex session:
+# $skill-installer yonlandwu/tung-shing-almanac-skill
 ```
 
-Or add to your AGENTS.md: "For Chinese almanac questions, run
-`tung-shing-almanac-skill/scripts/almanac.sh` and quote its output."
+Codex auto-discovers skills in `~/.agents/skills/` — trigger with
+`$tung-shing-almanac` or just ask "哪天适合搬家" (description matching).
 
 ## Quick Test
 
