@@ -69,9 +69,9 @@ Commercial: yonlandwu@gmail.com.
 
 ## GET /auspicious
 
-Params: `activity` (required — wedding, moving-house, grand-opening, renovation,
-c-section, signing-contracts, travel, starting-a-new-job), `days` (7-60,
-default 30), `key`. Returns up to 5 engine-recommended dates with score,
+Params: `activity` (required; canonical keys plus **natural-language synonyms**
+like marriage, buy-a-car, 结婚, 装修 — URL-encode Chinese), `days` (7-60,
+default 30), `weekend_only` (0/1 — Saturdays/Sundays only), `key`. Returns up to 5 engine-recommended dates with score,
 officer, clash, and reasons.
 
 ## GET /horoscope

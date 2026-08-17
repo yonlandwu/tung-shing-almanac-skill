@@ -14,10 +14,13 @@ free, no API key needed for ±90 days.
   engine computes: JPL DE440s ephemeris, the 1739 imperial canon, four-tier
   spirit arbitration, and validation against mainstream almanacs
 
-**What you get**: daily auspicious (宜) / avoid (忌) activities, the twelve
-Day Officers (建除十二神), Yellow/Black Belt hour deities (黃道黑道), zodiac
-clash (冲煞), lunar dates, and minute-precision 24 solar terms (节气) —
-computed from JPL DE440s ephemeris and the 1739 imperial canon.
+**What you get**: your AI agent can plan real-life events — the best dates for
+weddings, moving house, business launches, contract signings, car / home
+purchases, renovations, C-sections, travel, and new-job starts — plus daily
+auspicious (宜) / avoid (忌) activities, the twelve Day Officers (建除十二神),
+Yellow/Black Belt hour deities (黃道黑道), zodiac clash (冲煞), lunar dates,
+and minute-precision 24 solar terms (节气) — computed from JPL DE440s ephemeris
+and the 1739 imperial canon.
 
 ## Install
 
@@ -84,6 +87,24 @@ Most Chinese calendar APIs scrape or approximate. This one is built different:
   almanacs (12/12 hour pillars match).
 - **1900–2100 coverage** — 201 years of lunisolar conversion, leap months,
   GanZhi pillars, 28 lunar mansions, and festival dates.
+
+## Real-Life Scenarios
+
+`?activity=` accepts all of these natural synonyms (URL-encode Chinese):
+
+| Activity | Real-Life Scenario | Example Synonyms |
+|---|---|---|
+| `wedding` | Wedding & engagement planning | marriage, get-married, 领证, 嫁娶, 结婚 |
+| `moving-house` | Moving into a new home or office | moving, relocation, 搬家, 乔迁, 入宅 |
+| `grand-opening` | Business launches & store openings | launch, product-launch, ribbon-cutting, 开业, 剪彩 |
+| `renovation` | Renovation & groundbreaking | construction, groundbreaking, 装修, 动土 |
+| `c-section` | Planning a C-section birth | cesarean, childbirth, 剖腹产 |
+| `signing-contracts` | Contract signing & major purchases (car / real estate / business deals) | signing, buy-a-car, buy-a-house, 买车, 买房, 签约 |
+| `travel` | Trips, vacations & business travel | trip, vacation, flying, 旅游, 出差 |
+| `starting-a-new-job` | First day at a new job | new-job, career, 入职, 赴任 |
+
+Add `&weekend_only=1` to restrict results to Saturdays/Sundays (weddings are
+weekend-driven — roughly 63 of 2026's auspicious wedding days fall on weekends).
 
 ## Use Cases
 
