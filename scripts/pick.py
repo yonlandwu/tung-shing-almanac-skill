@@ -30,7 +30,6 @@ import sys
 import json
 import argparse
 import datetime
-import subprocess
 import urllib.request
 import urllib.parse
 
@@ -42,12 +41,13 @@ API = "https://12zodiacs.com/wp-json/12z/v1/almanac"
 CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cache")
 CACHE_TTL = 6 * 3600  # seconds
 
-_valid_until_cached = None  # solar-term boundary cache
-
-
 def api_get(endpoint, params, key=None):
     """GET with disk cache. Returns parsed JSON. Never raises on 4xx/5xx —
     returns {'_error': code, '_body': text}."""
+    if key is None:
+        key = os.environ.get("TZS_API_KEY")
+    if key:
+        params = dict(params, key=key)
     qs = urllib.parse.urlencode(params)
     url = f"{API}/{endpoint}?{qs}"
     os.makedirs(CACHE_DIR, exist_ok=True)
@@ -87,19 +87,23 @@ YANGONGJI_LUNAR = {  # 杨公十三忌 (lunar month, day)
     (7, 1), (7, 29), (8, 27), (9, 25), (10, 23), (11, 21), (12, 19),
 }
 SANNIANG_LUNAR_DAY = {3, 7, 13, 18, 22, 27}  # 三娘煞 (lunar day)
-SHIEDABAI_GZ = {  # 十恶大败 (day GanZhi index, 0-based JiaZi)
-    40, 53, 32, 11, 58, 25, 16, 23, 8, 59,
+SHIEDABAI_GZ = {  # 十恶大败 (day GanZhi index, 0-based JiaZi, 甲子=0)
+    # 甲辰40 乙巳41 丙申32 丁亥23 戊戌34 己丑25 庚辰16 辛巳17 壬申8 癸亥59
+    40, 41, 32, 23, 34, 25, 16, 17, 8, 59,
 }
 
 
 def gz_index(stem_cn, branch_cn):
+    """0-based JiaZi index (甲子=0) via CRT — n%10==stem, n%12==branch."""
     GAN = "甲乙丙丁戊己庚辛壬癸"
     ZHI = "子丑寅卯辰巳午未申酉戌亥"
-    try:
-        return (GAN.index(stem_cn) * 6 + ZHI.index(branch_cn)) % 60 \
-            if (GAN.index(stem_cn) % 2) == (ZHI.index(branch_cn) % 2) else None
-    except ValueError:
+    if stem_cn not in GAN or branch_cn not in ZHI:
         return None
+    a, b = GAN.index(stem_cn), ZHI.index(branch_cn)
+    for n in range(60):
+        if n % 10 == a and n % 12 == b:
+            return n
+    return None  # odd parity mismatch — impossible Ganzhi combo
 
 
 def get_solar_terms(year):
@@ -423,7 +427,7 @@ def score_day(day, profile, birth_zodiac):
         re_.append(f"Auspicious gods present (+2)")
 
     # 6. yi list contains the activity (API English folk list)
-    yi_text = " ".join(day.get("auspicious_for_yi", [])).lower()
+    yi_text = " ".join(clean_yi(day)).lower()
     if any(k.lower() in yi_text for k in profile["deep_yi_keywords"]):
         score += 12
         rz.append(f"当日宜含本事项(+12)")
@@ -458,15 +462,68 @@ def fmt_hours(hours, lang):
     return "、".join(parts)
 
 
+def parse_date(s):
+    try:
+        return datetime.date.fromisoformat(s.strip())
+    except ValueError:
+        print(json.dumps({"error": f"invalid date: {s}",
+                          "expected": "YYYY-MM-DD"}, ensure_ascii=False))
+        sys.exit(2)
+
+
 def daterange(start_s, end_s):
-    d0 = datetime.date.fromisoformat(start_s)
-    d1 = datetime.date.fromisoformat(end_s)
+    d0 = parse_date(start_s)
+    d1 = parse_date(end_s)
     if d1 < d0:
-        return
+        print(json.dumps({"error": "window end before start"}, ensure_ascii=False))
+        sys.exit(2)
     d = d0
     while d <= d1:
         yield d.isoformat()
         d += datetime.timedelta(days=1)
+
+
+def yi_list_raw(day):
+    return day.get("auspicious_for_yi", [])
+
+
+def clean_yi(day):
+    """Strip zero-width chars the API embeds in Yi/Ji strings."""
+    ZW = "\u200b\u200c\u200d\ufeff"
+    return [s.strip().translate({ord(c): None for c in ZW}) for s in yi_list_raw(day)]
+
+
+def _candidate(ds, day, score, base, adjust, rz, re_, birth_zodiac, with_hours=True):
+    return {
+        "date": ds,
+        "score": score,
+        "engine_score": base,
+        "local_adjustment": adjust,
+        "weekday": datetime.date.fromisoformat(ds).strftime("%A"),
+        "date_cn": f"{day['lunar']['month']}月{day['lunar']['day']}日",
+        "year_gz_cn": day["lunar"].get("year_gz_cn", ""),
+        "day_pillar_cn": day["day_pillar"]["stem_cn"] + day["day_pillar"]["branch_cn"],
+        "month_pillar_cn": day.get("folk", {}).get("month_pillar_cn", ""),
+        "officer_en": day["day_officer_zhi_shen"]["en"],
+        "officer_cn": day["day_officer_zhi_shen"]["cn"],
+        "belt_type": day["belt"]["type"],
+        "belt_cn": day["belt"]["name_cn"],
+        "clash_animal": day["clash"]["animal"],
+        "clash_animal_cn": ZH_ANIMAL_CN.get(day["clash"]["animal"], day["clash"]["animal"]),
+        "sha_direction": day.get("sha_direction", ""),
+        "relations": day.get("relations", {}).get("map", []),
+        "yi": clean_yi(day),
+        "ji": [s.strip().translate({ord(c): None for c in "\u200b\u200c\u200d\ufeff"})
+               for s in day.get("avoid_ji", [])],
+        "gods_auspicious": day.get("jishen_xiongsha", {}).get("auspicious", []),
+        "gods_caution": day.get("jishen_xiongsha", {}).get("caution", []),
+        "pengzu": day.get("pengzu", {}),
+        "nayin": day.get("folk", {}).get("nayin", []),
+        "reasons_zh": rz,
+        "reasons_en": re_,
+        # hours enriched later for top-N only (saves /hours calls)
+        "hours": enrich_hours(ds, birth_zodiac) if with_hours else [],
+    }
 
 
 def run(args):
@@ -484,61 +541,70 @@ def run(args):
     # ---------------- fast mode via /auspicious shortlist ----------------
     engine_meta = {}
     candidates = []
-    if profile["auspicious_api"] and args.mode == "fast":
+    used_fast = profile["auspicious_api"] and args.mode == "fast"
+    if used_fast:
         params = {"activity": profile["auspicious_api"],
                   "days": days_between(args.start, args.end)}
         if args.weekend_only:
             params["weekend_only"] = 1
         d = api_get("auspicious", params)
         recs = d.get("recommended_dates", []) if "_error" not in d else []
-        shortlist = [x["date"] for x in recs][:12]
-        engine_meta = {x["date"]: x for x in recs}
-    else:
+        # NOTE: the engine counts `days` from TODAY, not from --start. Clip
+        # the shortlist to the requested window and surface out-of-window
+        # dates as reference only.
+        start_d = parse_date(args.start)
+        end_d = parse_date(args.end)
+        in_window = [x for x in recs if start_d.isoformat() <= x["date"] <= end_d.isoformat()]
+        out_of_window = [x for x in recs if x not in in_window]
+        shortlist = [x["date"] for x in in_window]
+        engine_meta = {x["date"]: x for x in in_window}
+        if not shortlist:
+            # engine found nothing inside the window → fall back to deep scan
+            used_fast = False
+            args.mode = "deep"
+    if not used_fast:
         shortlist = list(daterange(args.start, args.end))
 
-    for ds in shortlist:
-        day = api_get("day", {"date": ds})
-        if "_error" in day:
-            continue
-        if args.mode == "fast" and ds in engine_meta:
-            score, base, adjust, rz, re_, veto = score_day_fast(
-                day, engine_meta[ds], profile, birth_zodiac)
-        else:
-            score, rz, re_, veto = score_day(day, profile, birth_zodiac)
-            base, adjust = None, 0
-        if veto:
-            continue  # hard-vetoed
-        candidates.append({
-            "date": ds,
-            "score": score,
-            "engine_score": base,
-            "local_adjustment": adjust,
-            "weekday": datetime.date.fromisoformat(ds).strftime("%A"),
-            "date_cn": f"{day['lunar']['month']}月{day['lunar']['day']}日",
-            "year_gz_cn": day["lunar"].get("year_gz_cn", ""),
-            "day_pillar_cn": day["day_pillar"]["stem_cn"] + day["day_pillar"]["branch_cn"],
-            "month_pillar_cn": day.get("folk", {}).get("month_pillar_cn", ""),
-            "officer_en": day["day_officer_zhi_shen"]["en"],
-            "officer_cn": day["day_officer_zhi_shen"]["cn"],
-            "belt_type": day["belt"]["type"],
-            "belt_cn": day["belt"]["name_cn"],
-            "clash_animal": day["clash"]["animal"],
-            "clash_animal_cn": ZH_ANIMAL_CN.get(day["clash"]["animal"], day["clash"]["animal"]),
-            "sha_direction": day.get("sha_direction", ""),
-            "relations": day.get("relations", {}).get("map", []),
-            "yi": day.get("auspicious_for_yi", []),
-            "ji": day.get("avoid_ji", []),
-            "gods_auspicious": day.get("jishen_xiongsha", {}).get("auspicious", []),
-            "gods_caution": day.get("jishen_xiongsha", {}).get("caution", []),
-            "pengzu": day.get("pengzu", {}),
-            "nayin": day.get("folk", {}).get("nayin", []),
-            "reasons_zh": rz,
-            "reasons_en": re_,
-            "hours": enrich_hours(ds, birth_zodiac),
-        })
+    def collect(shortlist, fast_mode):
+        out = []
+        for ds in shortlist:
+            day = api_get("day", {"date": ds})
+            if "_error" in day:
+                continue
+            if fast_mode and ds in engine_meta:
+                score, base, adjust, rz, re_, veto = score_day_fast(
+                    day, engine_meta[ds], profile, birth_zodiac)
+            else:
+                score, rz, re_, veto = score_day(day, profile, birth_zodiac)
+                base, adjust = None, 0
+            if veto:
+                continue  # hard-vetoed
+            # with_hours=False: enrich only after top-N cut (saves calls)
+            out.append(_candidate(ds, day, score, base, adjust, rz, re_,
+                                  birth_zodiac, with_hours=False))
+        return out
+
+    candidates = collect(shortlist, used_fast)
+
+    # fast shortlist exhausted (e.g. all vetoed) → deep fallback
+    if used_fast and len(candidates) < args.top:
+        extra = collect([d for d in daterange(args.start, args.end)
+                         if d not in set(shortlist)], fast_mode=False)
+        candidates.extend(extra)
+        args.mode = "fast+deep"
 
     candidates.sort(key=lambda x: -x["score"])
     candidates = candidates[: args.top]
+    # enrich lucky hours only for the finalists
+    for c in candidates:
+        c["hours"] = enrich_hours(c["date"], birth_zodiac)
+
+    # surface engine dates that fell outside the requested window
+    try:
+        oow = [{"date": x["date"], "score": x["score"], "officer": x["officer"],
+                "belt": x["belt"], "why": x["why"]} for x in out_of_window]
+    except NameError:
+        oow = []
 
     result = {
         "event": profile["zh"] if args.lang.startswith("zh") else ev,
@@ -548,6 +614,7 @@ def run(args):
         "mode": args.mode,
         "note_zh": profile["note_zh"], "note_en": profile["note_en"],
         "recommended": candidates,
+        "engine_dates_outside_window": oow,
         "attribution": "Almanac data computed by 12Zodiacs.com API",
     }
 
@@ -565,8 +632,8 @@ ZH_ANIMAL_CN = {"Rat": "鼠", "Ox": "牛", "Tiger": "虎", "Rabbit": "兔", "Dra
 
 
 def days_between(start_s, end_s):
-    d0 = datetime.date.fromisoformat(start_s)
-    d1 = datetime.date.fromisoformat(end_s)
+    d0 = parse_date(start_s)
+    d1 = parse_date(end_s)
     return max(7, min(60, (d1 - d0).days))
 
 

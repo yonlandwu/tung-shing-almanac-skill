@@ -99,8 +99,16 @@ opinionated date-selection engine:
   explicit points (`建除【开】日(+15) · 值神【天德】黄道(+20) · 吉神加持：不将(+18)`),
   in both Chinese and English.
 - **Hard-veto fixed inauspicious days** — 杨公忌 (Yang Gong 13 Taboos),
-  三娘煞 (Sanniang Sha), 十恶大败 (Ten Evils), and 四离四绝 (Four Departures /
-  Four Absolutes — computed from **minute-precision solar terms**, not tables).
+  三娘煞 (Sanniang Sha), 十恶大败 (Ten Evils, exact JiaZi-cycle indexing), and
+  四离四绝 (Four Departures / Four Absolutes — computed from
+  **minute-precision solar terms**, not tables).
+- **Trusts the engine score** — fast mode uses the `/auspicious` arbitration
+  score (0-5) as the primary score; local logic only adds what the engine
+  cannot know (patron zodiac veto/bonus, fixed inauspicious days, lucky
+  hours). `engine_score` and `local_adjustment` are reported separately.
+- **Window-safe** — engine dates outside the requested window are clipped
+  and reported as `engine_dates_outside_window`; empty shortlists fall back
+  to day-by-day deep scanning automatically.
 - **Patron matching** — `--birth 1990-05-20` resolves the patron's zodiac via
   the API (立春 boundary) and vetoes days that 冲/害 the patron, bonuses for
   三合/六合.
