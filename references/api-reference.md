@@ -79,3 +79,29 @@ officer, clash, and reasons.
 Params: `sign` (required — rat, ox, tiger, rabbit, dragon, snake, horse,
 goat, monkey, rooster, dog, pig), `date` (optional), `key`. Returns the
 daily luck score, tier, and 8 life categories.
+
+## GET /day — full field inventory (v2 picker relies on)
+
+Top-level: `date`, `lunar` (month/day/is_leap_month/year_gz_cn),
+`day_pillar` (stem/branch _cn, element, gz_index), `day_officer_zhi_shen`
+(en/cn/quality — en values: Establish/Remove/Full/Balance/Stable/Initiate/
+Break/Danger/Complete/Collect/Open/Close), `belt` (name/type yellow|black),
+`clash` (branch/animal/years), `sha_direction`, `relations` (12-zodiac map:
+chong/sanhe/liuhai/hai/self/plain), `folk` (month_pillar_cn, gods_direction
+喜/财/福/贵阳/贵阴, nayin, lucky_colors), `auspicious_for_yi`, `avoid_ji`,
+`solar_term`, `xiu_28`, `pengzu`, `gods` (blessings/vetoes/scoped_taboos),
+`jishen_xiongsha` (auspicious[]/caution[], Chinese names).
+
+## GET /term — keys
+
+`lichun yushui jingzhe chunfen qingming guyu lixia xiaoman mangzhong xiazhi
+xiaoshu dashu liqiu chushu bailu qiufen hanlu shuangjiang lidong xiaoxue
+daxue dongzhi xiaohan dahan` — each with minute-precision `utc8` + `date`.
+四离 = day before chunfen/xiazhi/qiufen/dongzhi; 四绝 = day before
+lichun/lixia/liqiu/lidong.
+
+## GET /auspicious — valid activities
+
+`wedding, moving-house, grand-opening, renovation, c-section,
+signing-contracts, travel, starting-a-new-job` (burial/worship NOT included —
+use day-by-day scanning via /day).

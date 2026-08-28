@@ -90,6 +90,34 @@ What `almanac.sh day 2026-08-18` returns (truncated):
 }
 ```
 
+## Auspicious Picker v2 — transparent scoring, bilingual, deliverable 择吉文书
+
+`scripts/pick.py` upgrades the skill from raw almanac queries to an
+opinionated date-selection engine:
+
+- **Transparent scoring** — every candidate date ships itemized reasons with
+  explicit points (`建除【开】日(+15) · 值神【天德】黄道(+20) · 吉神加持：不将(+18)`),
+  in both Chinese and English.
+- **Hard-veto fixed inauspicious days** — 杨公忌 (Yang Gong 13 Taboos),
+  三娘煞 (Sanniang Sha), 十恶大败 (Ten Evils), and 四离四绝 (Four Departures /
+  Four Absolutes — computed from **minute-precision solar terms**, not tables).
+- **Patron matching** — `--birth 1990-05-20` resolves the patron's zodiac via
+  the API (立春 boundary) and vetoes days that 冲/害 the patron, bonuses for
+  三合/六合.
+- **Full folk output** — four pillars (year/month/day), 28 mansions, Nayin,
+  Peng Zu taboos, auspicious & caution gods, Yi/Ji lists, and top-3 Yellow-Belt
+  lucky hours per day.
+- **Deliverable document** — `--document` renders a bilingual 择吉文书
+  (date-selection certificate) ready to hand to a client.
+- **10 events** — wedding, moving-house, grand-opening, renovation,
+  signing-contracts, travel, starting-a-new-job, c-section, plus deep-scan-only
+  burial (安葬) and ancestor-worship (祭祀).
+
+```bash
+python3 scripts/pick.py --event wedding --birth 1990-05-20 \
+    --start 2026-09-01 --end 2026-10-15 --document
+```
+
 ## Why 12Zodiacs API?
 
 Most Chinese calendar APIs scrape or approximate. This one is built different:

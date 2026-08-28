@@ -26,6 +26,40 @@ bash scripts/almanac.sh day 2027-03-15 $KEY    # With API key (±365 days)
 
 Requires: curl + jq. No other dependencies.
 
+## Auspicious Date Picker (bilingual, transparent scoring)
+
+For "pick me a wedding date in October / 帮我算十月领证的好日子" style requests,
+use the picker — it combines the engine shortlist with transparent itemized
+scoring, hard-veto fixed inauspicious days (杨公忌 / 三娘煞 / 十恶大败 / 四离四绝),
+patron-zodiac clash checks, per-day lucky hours, and a deliverable
+date-selection document (择吉文书). Output is bilingual (中英对照).
+
+```bash
+PY=python3   # any Python 3.8+, stdlib only
+$PY scripts/pick.py --event wedding --birth 1990-05-20 \
+    --start 2026-09-01 --end 2026-10-15 --top 5          # full scoring, zh+en
+$PY scripts/pick.py --event 婚嫁 --birth 1990-05-20 \
+    --start 2026-09-01 --end 2026-09-30 --document        # deliverable 择吉文书
+$PY scripts/pick.py --event wedding --start 2026-09-01 \
+    --end 2026-10-15 --weekend-only --top 5               # weekends only
+$PY scripts/pick.py --event 安葬 --start 2026-09-01 \
+    --end 2026-09-30 --top 5                              # deep events (no fast engine)
+$PY scripts/pick.py --event wedding --start 2026-09-01 \
+    --end 2026-09-30 --json --lang en                     # machine-readable, English-first
+```
+
+Events: `wedding/婚嫁`, `moving-house/入宅`, `grand-opening/开业`,
+`renovation/装修动土`, `signing-contracts/签约`, `travel/出行`,
+`starting-a-new-job/入职`, `c-section/剖腹产`, plus deep-only
+`burial/安葬`, `ancestor-worship/祭祀`.
+
+- `--birth` matches the patron's zodiac against each day (hard-veto 冲/害,
+  bonus 三合/六合).
+- Every candidate carries itemized reasons with scores, e.g.
+  `建除【开】日(+15) · 值神【天德】黄道(+20) · 吉神加持：不将,月德(+18)`.
+- `burial` / `ancestor-worship` auto-switch to day-by-day deep scanning.
+- Requires only Python 3 stdlib; results cached 6h in `scripts/.cache/`.
+
 ## Reading the Output
 
 | Field | Meaning |
