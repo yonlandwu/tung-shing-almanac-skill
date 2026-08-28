@@ -267,22 +267,86 @@ def resolve_event(raw):
 
 
 def zodiac_of_birth(birth_str):
-    """Return Chinese zodiac slug via API (authoritative, 立春 boundary)."""
+    """Return Chinese zodiac (立春 boundary) for a birth date.
+    Tries the API first; falls back to a pure stem-branch cycle computation
+    (year GanZhi from JDN offset — exact for years 1900-2100) when the date
+    is outside the free ±90d window."""
     d = api_get("day", {"date": birth_str})
-    if "_error" in d:
-        return None
-    # birth year zodiac = year GanZhi branch
-    ygz = d.get("lunar", {}).get("year_gz", "")
+    if "_error" not in d and d.get("lunar"):
+        ygz = d.get("lunar", {}).get("year_gz", "")
+        branch_cn = ygz[1] if len(ygz) >= 2 else ""
+    else:
+        # Offline fallback: year GanZhi cycles independently of the free-tier
+        # window. 1984 = 甲子 (index 0); approximate 立春 boundary Feb 4.
+        try:
+            y = datetime.date.fromisoformat(birth_str)
+        except ValueError:
+            return None
+        gz_year = y.year - (1 if (y.month, y.day) < (2, 4) else 0)
+        idx = (gz_year - 1984) % 60
+        ZHI = "子丑寅卯辰巳午未申酉戌亥"
+        branch_cn = ZHI[idx % 12]
     ZHI = "子丑寅卯辰巳午未申酉戌亥"
     ANIMALS = ["rat", "ox", "tiger", "rabbit", "dragon", "snake",
                "horse", "goat", "monkey", "rooster", "dog", "pig"]
     ANIMALS_CN = "鼠牛虎兔龙蛇马羊猴鸡狗猪"
-    if len(ygz) >= 2:
-        branch_cn = ygz[1]
-        if branch_cn in ZHI:
-            i = ZHI.index(branch_cn)
-            return {"slug": ANIMALS[i], "cn": ANIMALS_CN[i]}
+    if branch_cn in ZHI:
+        i = ZHI.index(branch_cn)
+        return {"slug": ANIMALS[i], "cn": ANIMALS_CN[i]}
     return None
+
+
+def score_day_fast(day, eng, profile, birth_zodiac):
+    """Fast mode: the /auspicious engine score IS the primary score (four-tier
+    arbitration already excludes Month/Year Breakers, Four Departures/Absolutes,
+    and non-premier officers). Local work is limited to what the engine cannot
+    know: fixed inauspicious days (Yang Gong Ji / Sanniang Sha / Shi E Da Bai),
+    patron-zodiac veto (chong/hai) and sanhe/liuhe bonus. No re-scoring of
+    officer/belt/gods — those stay descriptive fields.
+    Returns (score, base, adjust, reasons_zh, reasons_en, veto)."""
+    base = int(eng.get("score", 0))
+    score = base
+    adjust = 0
+    verdict = f"{eng.get('officer', '')} officer, {eng.get('belt', '')} belt"
+    rz = [f"引擎四层仲裁评分：{base}/5 · {verdict}"]
+    re_ = [f"Engine arbitration score: {base}/5 ({verdict})"] + \
+        [f"{w}" for w in eng.get("why", [])]
+    veto = []
+
+    lunar = day.get("lunar", {})
+    lm, ld = lunar.get("month", 0), lunar.get("day", 0)
+    gz_i = gz_index(day.get("day_pillar", {}).get("stem_cn", ""),
+                    day.get("day_pillar", {}).get("branch_cn", ""))
+    terms = get_solar_terms(int(day["date"][:4]))
+    slsj = si_li_si_jue(day["date"], terms)
+
+    if (lm, ld) in YANGONGJI_LUNAR:
+        veto.append(("杨公忌", "Yang Gong Ji"))
+    if profile.get("veto_sanniang") and ld in SANNIANG_LUNAR_DAY:
+        veto.append(("三娘煞", "Sanniang Sha"))
+    if gz_i in SHIEDABAI_GZ:
+        veto.append(("十恶大败", "Shi E Da Bai"))
+    if slsj:  # engine should have excluded these; belt-and-suspenders check
+        veto.append((slsj, "Si Li / Si Jue"))
+
+    if birth_zodiac:
+        rel_map = {m["slug"]: m["rel"] for m in day.get("relations", {}).get("map", [])}
+        rel = rel_map.get(birth_zodiac["slug"], "plain")
+        if rel in ("chong", "hai"):
+            veto.append((f"本命{ZH_REL[rel]}({birth_zodiac['cn']})",
+                         f"Clashes patron ({ZH_REL[rel]})"))
+        elif rel in ("sanhe", "liuhe"):
+            adjust = SANHE_LIUHE_SCORE
+            score += adjust
+            rz.append(f"日支与福主{ZH_REL[rel]}(+{adjust})")
+            re_.append(f"{'San He' if rel == 'sanhe' else 'Liu He'} with patron (+{adjust})")
+        elif rel == "self":
+            # 伏吟 (day branch == patron branch): folk-taboo for weddings,
+            # neutral-weak otherwise — keep as candidate, no bonus
+            rz.append(f"日支与福主本位（伏吟，婚嫁慎用）")
+            re_.append("Day branch = patron branch (Fu Yin, cautious for weddings)")
+
+    return score, base, adjust, rz, re_, veto
 
 
 def score_day(day, profile, birth_zodiac):
@@ -418,6 +482,7 @@ def run(args):
         birth_zodiac = zodiac_of_birth(args.birth)
 
     # ---------------- fast mode via /auspicious shortlist ----------------
+    engine_meta = {}
     candidates = []
     if profile["auspicious_api"] and args.mode == "fast":
         params = {"activity": profile["auspicious_api"],
@@ -425,7 +490,9 @@ def run(args):
         if args.weekend_only:
             params["weekend_only"] = 1
         d = api_get("auspicious", params)
-        shortlist = [x["date"] for x in d.get("recommended_dates", []) if "_error" not in d][:12]
+        recs = d.get("recommended_dates", []) if "_error" not in d else []
+        shortlist = [x["date"] for x in recs][:12]
+        engine_meta = {x["date"]: x for x in recs}
     else:
         shortlist = list(daterange(args.start, args.end))
 
@@ -433,12 +500,19 @@ def run(args):
         day = api_get("day", {"date": ds})
         if "_error" in day:
             continue
-        score, rz, re_, veto = score_day(day, profile, birth_zodiac)
+        if args.mode == "fast" and ds in engine_meta:
+            score, base, adjust, rz, re_, veto = score_day_fast(
+                day, engine_meta[ds], profile, birth_zodiac)
+        else:
+            score, rz, re_, veto = score_day(day, profile, birth_zodiac)
+            base, adjust = None, 0
         if veto:
             continue  # hard-vetoed
         candidates.append({
             "date": ds,
             "score": score,
+            "engine_score": base,
+            "local_adjustment": adjust,
             "weekday": datetime.date.fromisoformat(ds).strftime("%A"),
             "date_cn": f"{day['lunar']['month']}月{day['lunar']['day']}日",
             "year_gz_cn": day["lunar"].get("year_gz_cn", ""),
@@ -516,7 +590,13 @@ def render_text(result, lang, as_document):
     for i, c in enumerate(result["recommended"], 1):
         lines.append("")
         belt_zh = "黄道" if c["belt_type"] == "yellow" else "黑道"
-        lines.append(f"◆ 候选 {i} Candidate 〔{c['score']} 分〕")
+        if c.get("engine_score") is not None:
+            adj = c.get("local_adjustment", 0)
+            score_line = f"◆ 候选 {i} Candidate 〔引擎 Engine {c['engine_score']}/5"
+            score_line += f" + 生肖调整 zodiac +{adj} = {c['score']}〕" if adj else f"〕"
+        else:
+            score_line = f"◆ 候选 {i} Candidate 〔{c['score']} 分〕"
+        lines.append(score_line)
         lines.append(f"  公历 {c['date']} ({c['weekday']})  农历 {c['date_cn']}")
         lines.append(f"  四柱 Pillars: 年 {c['year_gz_cn']}  月 {c['month_pillar_cn']}  日 {c['day_pillar_cn']}")
         lines.append(f"  建除 Officer: {c['officer_cn']} ({c['officer_en']})   值神 {c['belt_cn']} ({belt_zh})")
@@ -530,16 +610,21 @@ def render_text(result, lang, as_document):
         lines.append(f"  忌 Ji: {'; '.join(c['ji']) or '—'}")
         lines.append(f"  吉时 Hours: {fmt_hours(c['hours'], 'zh' if zh else 'en')}")
         lines.append("  入选理由 Why:")
+        fast = c.get("engine_score") is not None
         if zh:
             for r in c["reasons_zh"]:
                 lines.append(f"    · {r}")
+            # fast mode: engine whys are bilingual already; only print the
+            # extra local adjustment lines from the en list (avoid duplicates)
             for r in c["reasons_en"]:
-                lines.append(f"    · {r}")
+                if fast and not any(r2.endswith(r) or r2 == r for r2 in c["reasons_zh"]):
+                    lines.append(f"    · {r}")
         else:
             for r in c["reasons_en"]:
                 lines.append(f"    · {r}")
-            for r in c["reasons_zh"]:
-                lines.append(f"    · {r}")
+            if not fast:
+                for r in c["reasons_zh"]:
+                    lines.append(f"    · {r}")
     lines.append("")
     lines.append("-" * 60)
     lines.append(f"民俗提示 Note: {result['note_zh']}")

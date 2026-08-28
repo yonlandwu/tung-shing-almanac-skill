@@ -55,9 +55,16 @@ Events: `wedding/婚嫁`, `moving-house/入宅`, `grand-opening/开业`,
 
 - `--birth` matches the patron's zodiac against each day (hard-veto 冲/害,
   bonus 三合/六合).
-- Every candidate carries itemized reasons with scores, e.g.
-  `建除【开】日(+15) · 值神【天德】黄道(+20) · 吉神加持：不将,月德(+18)`.
-- `burial` / `ancestor-worship` auto-switch to day-by-day deep scanning.
+- **Scoring split**: in fast mode the `/auspicious` engine score (0-5,
+  four-tier arbitration) IS the primary score — the picker does NOT re-score
+  officer/belt/gods locally. Local additions are only what the engine cannot
+  know: patron-zodiac adjustments (+15 sanhe/liuhe, veto chong/hai), fixed
+  inauspicious days, and lucky-hour enrichment. Each candidate reports
+  `engine_score` + `local_adjustment` separately (JSON) — no double counting.
+- Every candidate carries itemized reasons, e.g.
+  `引擎四层仲裁评分：5/5 · Open officer, yellow belt · Premier Open (开) Day Officer`.
+- `burial` / `ancestor-worship` auto-switch to day-by-day deep scanning
+  (full local scoring, since no engine shortlist exists for them).
 - Requires only Python 3 stdlib; results cached 6h in `scripts/.cache/`.
 
 ## Reading the Output
