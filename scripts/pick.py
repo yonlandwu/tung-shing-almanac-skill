@@ -226,8 +226,8 @@ PROFILES = {
     "burial": {
         "zh": "安葬", "aliases": ["funeral", "下葬", "安葬", "落葬"],
         "auspicious_api": None, "deep_yi_keywords": ["burial", "funeral", "安葬", "启钻"],
-        "good_officers": ["Closed", "Remove", "Stable", "Collect"],
-        "avoid_officers": ["Breaker"],
+        "good_officers": ["Close", "Remove", "Stable", "Collect"],
+        "avoid_officers": ["Break"],
         "prefer_gods": ["鸣吠", "鸣吠对", "天德", "月德", "三合"],
         "prefer_gods_en": ["Ming Fei", "Tian De", "Yue De"],
         "veto_sanniang": False, "major": True,
@@ -237,8 +237,8 @@ PROFILES = {
     "ancestor-worship": {
         "zh": "祭祀", "aliases": ["worship", "祭祀", "祭拜", "上坟"],
         "auspicious_api": None, "deep_yi_keywords": ["worship", "prayer", "ancestor", "祭祀"],
-        "good_officers": ["Stable", "Closed", "Remove", "Full"],
-        "avoid_officers": ["Breaker"],
+        "good_officers": ["Stable", "Close", "Remove", "Full"],
+        "avoid_officers": ["Break"],
         "prefer_gods": ["天德", "月德", "天愿", "民日", "福德"],
         "prefer_gods_en": ["Tian De", "Yue De", "Tian Yuan", "Min Ri"],
         "veto_sanniang": False, "major": False,
@@ -277,7 +277,7 @@ def zodiac_of_birth(birth_str):
     is outside the free ±90d window."""
     d = api_get("day", {"date": birth_str})
     if "_error" not in d and d.get("lunar"):
-        ygz = d.get("lunar", {}).get("year_gz", "")
+        ygz = d.get("lunar", {}).get("year_gz_cn", "")  # 丙午 — CN chars
         branch_cn = ygz[1] if len(ygz) >= 2 else ""
     else:
         # Offline fallback: year GanZhi cycles independently of the free-tier
