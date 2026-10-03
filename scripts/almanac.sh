@@ -13,15 +13,15 @@ case "$CMD" in
   day)
     DATE_Q=""
     [ -n "$ARG" ] && DATE_Q="date=$ARG"
-    curl -s "${API}/day?${DATE_Q}${KEY_Q}" | jq .
+    curl -s -A 'tung-shing-almanac-skill/2.0' "${API}/day?${DATE_Q}${KEY_Q}" | jq .
     ;;
   hours)
     : "${ARG:?usage: almanac.sh hours YYYY-MM-DD}"
-    curl -s "${API}/hours?date=${ARG}${KEY_Q}" | jq .
+    curl -s -A 'tung-shing-almanac-skill/2.0' "${API}/hours?date=${ARG}${KEY_Q}" | jq .
     ;;
   term)
     : "${ARG:?usage: almanac.sh term YYYY}"
-    curl -s "${API}/term?year=${ARG}${KEY_Q}" | jq .
+    curl -s -A 'tung-shing-almanac-skill/2.0' "${API}/term?year=${ARG}${KEY_Q}" | jq .
     ;;
   auspicious)
     # Pick auspicious dates for an activity. Synonyms welcome:
@@ -34,7 +34,7 @@ case "$CMD" in
     KEY_AQ=""
     [ "$WEEKEND" = "1" ] && WK_Q="&weekend_only=1"
     [ -n "$KEY_A" ] && KEY_AQ="&key=$KEY_A"
-    curl -s "${API}/auspicious?activity=${ARG}&days=${DAYS}${WK_Q}${KEY_AQ}" | jq .
+    curl -s -A 'tung-shing-almanac-skill/2.0' "${API}/auspicious?activity=${ARG}&days=${DAYS}${WK_Q}${KEY_AQ}" | jq .
     ;;
   lucky-hour)
     # Personal best hours for your zodiac on a date: e.g. lucky-hour horse 2026-08-22
@@ -46,7 +46,7 @@ case "$CMD" in
       DATE_Q="&date=$DATE_L"
       [ -n "${4:-}" ] && KEY_LQ="&key=$4"
     fi
-    curl -s "${API}/personal-hours?zodiac=${ARG}${DATE_Q}${KEY_LQ}" | jq .
+    curl -s -A 'tung-shing-almanac-skill/2.0' "${API}/personal-hours?zodiac=${ARG}${DATE_Q}${KEY_LQ}" | jq .
     ;;
   horoscope)
     # Daily zodiac horoscope: rat|ox|tiger|rabbit|dragon|snake|horse|goat|monkey|rooster|dog|pig
@@ -54,7 +54,7 @@ case "$CMD" in
     DATE_H="${3:-}"
     DATE_Q=""
     if [[ "$DATE_H" =~ ^[0-9]{4}- ]]; then DATE_Q="&date=$DATE_H"; KEY=""; KEY_Q=""; fi
-    curl -s "${API}/horoscope?sign=${ARG}${DATE_Q}${KEY_Q}" | jq .
+    curl -s -A 'tung-shing-almanac-skill/2.0' "${API}/horoscope?sign=${ARG}${DATE_Q}${KEY_Q}" | jq .
     ;;
   *)
     echo "usage: almanac.sh {day|hours|term|auspicious|horoscope} [args] [api_key]" >&2
