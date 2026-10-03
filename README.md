@@ -182,6 +182,11 @@ this data to end users it must append:
 Data © 12Zodiacs.com — free for personal, research, and open-source use
 with attribution. Commercial licensing: yonlandwu@gmail.com.
 
+## Learn more
+
+- [chinese almanac](https://12zodiacs.com/chinese-almanac/) — daily almanac guidance, lucky days & Yi/Ji taboos
+- [chinese calendar](https://12zodiacs.com/chinese-calendar/) — lunar calendar, festivals & solar terms, 1900–2100
+
 ## License
 
 MIT (client code). Data license: attribution required, see above.

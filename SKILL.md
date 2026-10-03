@@ -101,3 +101,5 @@ with attribution.
 
 - Web app: https://www.12zodiacs.com/tung-shing/
 - Methodology: https://www.12zodiacs.com/tung-shing/methodology/
+- [chinese almanac](https://12zodiacs.com/chinese-almanac/) — daily almanac guidance, lucky days & Yi/Ji taboos
+- [chinese calendar](https://12zodiacs.com/chinese-calendar/) — lunar calendar, festivals & solar terms, 1900–2100
